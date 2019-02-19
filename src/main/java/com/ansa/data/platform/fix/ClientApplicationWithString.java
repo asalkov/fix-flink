@@ -4,24 +4,18 @@ import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import quickfix.*;
 import quickfix.fix42.MessageCracker;
 
-
+import java.time.LocalDateTime;
 import java.util.concurrent.BlockingQueue;
 
-public class ClientApplication extends MessageCracker implements Application {
-
+public class ClientApplicationWithString extends MessageCracker implements Application {
 
     private SourceFunction.SourceContext ctx;
-    private BlockingQueue<Message> queue;
 
-    public ClientApplication(){
-
-    }
-    public ClientApplication(BlockingQueue<Message> queue){
-        this.queue = queue;
+    public ClientApplicationWithString(){
 
     }
 
-    public ClientApplication(SourceFunction.SourceContext ctx){
+    public ClientApplicationWithString(SourceFunction.SourceContext ctx){
         this.ctx = ctx;
     }
 
@@ -60,11 +54,8 @@ public class ClientApplication extends MessageCracker implements Application {
     @Override
     public void fromApp(Message message, SessionID sessionId) throws FieldNotFound,
             IncorrectDataFormat, IncorrectTagValue, UnsupportedMessageType {
-        if (queue != null){
-            queue.offer(message);
-        }
         if (ctx != null){
-            ctx.collect(message);
+            ctx.collect(LocalDateTime.now().toString());
         }
     }
 }

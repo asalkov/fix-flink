@@ -11,20 +11,38 @@ public class FixSource implements SourceFunction<Message> {
     private BlockingQueue<Message> queue = new SynchronousQueue<>();
 
 
-//    @Override
-//    public void open(Configuration parameters) throws Exception {
-//        super.open(parameters);
-//    }
+    private class QueueSizePrinter implements Runnable{
+
+        private BlockingQueue queue;
+        public QueueSizePrinter(BlockingQueue queue){
+            this.queue = queue;
+        }
+
+        @Override
+        public void run() {
+
+            while (true){
+                System.out.println("Queue size : " + queue.size());
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
     @Override
     public void run(SourceContext ctx) throws Exception {
-        FixUtils.configure(queue);
-        while (true){
-            Message value = queue.take();
-            if (value != null)
-                ctx.collect(value);
-            Thread.sleep(5000);
-        }
+        FixUtils.configure(ctx);
+        //new Thread(new QueueSizePrinter(queue)).start();
+
+//        while (true){
+//            Message value = queue.take();
+//            if (value != null)
+//                ctx.collect(value);
+//            Thread.sleep(5000);
+//        }
     }
 
     @Override
